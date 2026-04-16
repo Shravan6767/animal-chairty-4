@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app)
 
 # PASTE YOUR ACTUAL CONNECTION STRING HERE
-MONGO_URI = "mongodb+srv://your_username:your_password@cluster.mongodb.net/your_db"
+MONGO_URI = "mongodb+srv://Shravan67:shravan123@cluster0.dojp0db.mongodb.net/?appName=Cluster0"
 client = MongoClient(MONGO_URI)
 db = client['animal_charity'] # Use your actual DB name
 

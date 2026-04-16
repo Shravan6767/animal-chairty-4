@@ -33,3 +33,18 @@ def get_contacts():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def login():
+    if request.method == 'OPTIONS':
+        return '', 200
+        
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+
+    # Simple check for now - replace with your actual logic
+    if username == "admin" and password == "admin123":
+        return jsonify({"success": True, "message": "Login successful"}), 200
+    else:
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401

@@ -1,88 +1,26 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, jsonify
 from flask_cors import CORS
-from config import contacts_collection, donations_collection
-from flask import Flask, render_template
+from pymongo import MongoClient
 
 app = Flask(__name__)
 CORS(app)
 
-# Home route
-@app.route('/')
-def index():
-    return render_template('index.html')
+# PASTE YOUR ACTUAL CONNECTION STRING HERE
+MONGO_URI = "mongodb+srv://your_username:your_password@cluster.mongodb.net/your_db"
+client = MongoClient(MONGO_URI)
+db = client['animal_charity'] # Use your actual DB name
 
-
-# Contact route
-@app.route('/api/contact', methods=['POST'])
-def contact():
-    data = request.json
-
-    contact_data = {
-        "name": data.get("name"),
-        "email": data.get("email"),
-        "message": data.get("message")
-    }
-
-    contacts_collection.insert_one(contact_data)
-
-    return jsonify({
-        "success": True,
-        "message": "Contact saved successfully"
-    })
-
-
-# Donation route
-@app.route('/api/donations', methods=['POST'])
-def donate():
-    data = request.json
-
-    donation_data = {
-        "name": data.get("name"),
-        "email": data.get("email"),
-        "amount": data.get("amount"),
-        "message": data.get("message")
-    }
-
-    donations_collection.insert_one(donation_data)
-
-    return jsonify({
-        "success": True,
-        "message": "Donation saved successfully"
-    })
-
-
-# Login route
-@app.route('/api/login', methods=['POST'])
-def login():
-
-    data = request.json
-    email = data.get("email")
-    password = data.get("password")
-
-    if email == "admin@paws.com" and password == "1234":
-        return jsonify({"success": True})
-
-    return jsonify({
-        "success": False,
-        "message": "Invalid email or password"
-    })
-
-
-# Admin route to get contacts
 @app.route('/api/admin/contacts', methods=['GET'])
 def get_contacts():
-
-    contacts = list(contacts_collection.find({}, {"_id": 0}))
-    return jsonify(contacts)
-
-
-# Admin route to get donations
-@app.route('/api/admin/donations', methods=['GET'])
-def get_donations():
-
-    donations = list(donations_collection.find({}, {"_id": 0}))
-    return jsonify(donations)
-
+    try:
+        # This reaches into your 'contacts' collection
+        contacts = list(db.contacts.find({}, {'_id': 0}))
+        return jsonify(contacts)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Render needs this port binding to detect the 'open port'
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
